@@ -19,14 +19,18 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
         io::{Read, Write},
     };
 
-    let mut response = [0; 512];
-    stream.read(&mut response)?;
+    let mut request = [0; 512];
+    stream.read(&mut request)?;
 
-    let contents = fs::read_to_string("hello.html")?;
-    let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+    let get = b"GET / HTTP/1.1\r\n";
 
-    stream.write(response.as_bytes())?;
-    stream.flush()?;
+    if request.starts_with(get) {
+        let contents = fs::read_to_string("hello.html")?;
+        let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
+
+        stream.write(response.as_bytes())?;
+        stream.flush()?;
+    }
 
     Ok(())
 }
