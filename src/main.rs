@@ -30,6 +30,14 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
 
         stream.write(response.as_bytes())?;
         stream.flush()?;
+    } else {
+        let status_line = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+        let contents = fs::read_to_string("404.html")?;
+
+        let response = format!("{}{}", status_line, contents);
+
+        stream.write(response.as_bytes())?;
+        stream.flush()?;
     }
 
     Ok(())
