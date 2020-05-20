@@ -14,12 +14,15 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
-    use std::io::Read;
+    use std::io::{Read, Write};
 
-    let mut buffer = [0; 512];
-    stream.read(&mut buffer)?;
+    let mut response = [0; 512];
+    stream.read(&mut response)?;
 
-    println!("Request: {}", String::from_utf8_lossy(&buffer[..]));
+    let response = "HTTP/1.1 200 OK\r\n\r\n";
+
+    stream.write(response.as_bytes())?;
+    stream.flush()?;
 
     Ok(())
 }
