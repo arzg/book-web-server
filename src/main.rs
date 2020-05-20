@@ -24,21 +24,17 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
 
     let get = b"GET / HTTP/1.1\r\n";
 
-    if request.starts_with(get) {
-        let contents = fs::read_to_string("hello.html")?;
-        let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", contents);
-
-        stream.write(response.as_bytes())?;
-        stream.flush()?;
+    let (status_line, filename) = if request.starts_with(get) {
+        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
     } else {
-        let status_line = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
-        let contents = fs::read_to_string("404.html")?;
+        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
+    };
 
-        let response = format!("{}{}", status_line, contents);
+    let contents = fs::read_to_string(filename)?;
+    let response = format!("{}{}", status_line, contents);
 
-        stream.write(response.as_bytes())?;
-        stream.flush()?;
-    }
+    stream.write(response.as_bytes())?;
+    stream.flush()?;
 
     Ok(())
 }
