@@ -1,29 +1,28 @@
-use std::net::TcpStream;
+use tokio::{net::TcpStream, prelude::*};
 
-fn main() -> anyhow::Result<()> {
-    use std::net::TcpListener;
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    use tokio::{net::TcpListener, stream::StreamExt};
 
-    let listener = TcpListener::bind("127.0.0.1:7878")?;
+    let mut listener = TcpListener::bind("127.0.0.1:7878").await?;
+    let mut incoming = listener.incoming();
 
-    for stream in listener.incoming() {
+    while let Some(stream) = incoming.next().await {
         let stream = stream?;
 
         // We don’t want to stop the server if an error occurs, so just ignore it and continue.
-        let _ = handle_connection(stream);
+        let _ = handle_connection(stream).await;
     }
 
     Ok(())
 }
 
-fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
+async fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
     use book_web_server::{Method, Request, Response, Status, Uri, Version};
-    use std::{
-        fs,
-        io::{Read, Write},
-    };
+    use tokio::fs;
 
     let mut request = [0; 512];
-    let _ = stream.read(&mut request)?;
+    let _ = stream.read(&mut request).await?;
 
     let request = String::from_utf8_lossy(&request);
     let request = Request::new(&request)?;
@@ -34,7 +33,7 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
         (Status::NotFound, "404.html")
     };
 
-    let body = fs::read_to_string(filename)?;
+    let body = fs::read_to_string(filename).await?;
 
     let response = Response {
         version: Version::OneDotOne,
@@ -43,8 +42,8 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
         body: &body,
     };
 
-    stream.write_all(response.to_string().as_bytes())?;
-    stream.flush()?;
+    stream.write_all(response.to_string().as_bytes()).await?;
+    stream.flush().await?;
 
     Ok(())
 }

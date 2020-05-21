@@ -8,3 +8,4 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 anyhow = "1"
 nom = "5"
+tokio = { version = "0.2", features = ["full"] }
