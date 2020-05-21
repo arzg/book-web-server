@@ -23,7 +23,7 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
     };
 
     let mut request = [0; 512];
-    stream.read(&mut request)?;
+    let _ = stream.read(&mut request)?;
 
     let request = String::from_utf8_lossy(&request);
     let request = Request::new(&request)?;
