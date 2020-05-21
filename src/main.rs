@@ -7,7 +7,9 @@ fn main() -> anyhow::Result<()> {
 
     for stream in listener.incoming() {
         let stream = stream?;
-        handle_connection(stream)?;
+
+        // We don’t want to stop the server if an error occurs, so just ignore it and continue.
+        let _ = handle_connection(stream);
     }
 
     Ok(())
