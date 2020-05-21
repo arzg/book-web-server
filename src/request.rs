@@ -24,7 +24,14 @@ pub struct Request<'a> {
 }
 
 impl<'a> Request<'a> {
-    pub fn new(s: &'a str) -> Result<Self, nom::Err<(&str, nom::error::ErrorKind)>> {
+    pub fn new(s: &'a str) -> Result<Self, nom::Err<nom::error::ErrorKind>> {
+        match Self::new_iresult(s) {
+            Ok((_, r)) => Ok(r),
+            Err(e) => Err(e.map(|(_, e)| e)),
+        }
+    }
+
+    fn new_iresult(s: &'a str) -> nom::IResult<&str, Self> {
         use nom::{multi::many0, sequence::tuple};
 
         let (s, (method, _, uri, _, version, _, headers, _)) = tuple((
@@ -38,12 +45,15 @@ impl<'a> Request<'a> {
             crate::crlf,
         ))(s)?;
 
-        Ok(Self {
-            method,
-            uri,
-            version,
-            headers,
-            body: s,
-        })
+        Ok((
+            "",
+            Self {
+                method,
+                uri,
+                version,
+                headers,
+                body: s,
+            },
+        ))
     }
 }
