@@ -16,7 +16,7 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
-    use book_web_server::{Method, Request, Uri};
+    use book_web_server::{Method, Request, Response, Status, Uri, Version};
     use std::{
         fs,
         io::{Read, Write},
@@ -28,16 +28,22 @@ fn handle_connection(mut stream: TcpStream) -> anyhow::Result<()> {
     let request = String::from_utf8_lossy(&request);
     let request = Request::new(&request)?;
 
-    let (status_line, filename) = if request.method == Method::Get && request.uri == Uri::root() {
-        ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
+    let (status, filename) = if request.method == Method::Get && request.uri == Uri::root() {
+        (Status::Ok, "hello.html")
     } else {
-        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
+        (Status::NotFound, "404.html")
     };
 
-    let contents = fs::read_to_string(filename)?;
-    let response = format!("{}{}", status_line, contents);
+    let body = fs::read_to_string(filename)?;
 
-    stream.write_all(response.as_bytes())?;
+    let response = Response {
+        version: Version::OneDotOne,
+        status,
+        headers: Vec::new(),
+        body: &body,
+    };
+
+    stream.write_all(response.to_string().as_bytes())?;
     stream.flush()?;
 
     Ok(())
