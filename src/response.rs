@@ -21,6 +21,7 @@ use std::fmt;
 ///     "HTTP/1.1 200 OK\r\nContent-Length: 13\r\n\r\nHello, world!".to_string(),
 /// );
 /// ```
+#[derive(Debug)]
 pub struct Response<'header, 'body> {
     pub version: crate::Version,
     pub status: crate::Status,

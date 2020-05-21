@@ -9,6 +9,7 @@ use std::fmt;
 /// assert_eq!(Status::Continue.reason_phrase(), "Continue");
 /// assert_eq!(format!("{}", Status::Ok), "200 OK");
 /// ```
+#[derive(Debug)]
 pub enum Status {
     Continue,
     SwitchingProtocols,
