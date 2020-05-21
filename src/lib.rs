@@ -1,12 +1,14 @@
 mod header;
 mod method;
 mod request;
+mod status;
 mod uri;
 mod version;
 
 pub use header::Header;
 pub use method::Method;
 pub use request::Request;
+pub use status::Status;
 pub use uri::Uri;
 pub use version::Version;
 
