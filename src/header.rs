@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// An HTTP header.
 ///
 /// ```
@@ -12,6 +14,17 @@
 ///             val: "1000",
 ///         }
 ///     ))
+/// );
+///
+/// assert_eq!(
+///     format!(
+///         "{}",
+///         Header {
+///             field: "Content-Length",
+///             val: "100",
+///         }
+///     ),
+///     "Content-Length: 100".to_string()
 /// );
 /// ```
 #[derive(Debug, PartialEq)]
@@ -34,5 +47,11 @@ impl<'a> Header<'a> {
         let (s, _) = crate::crlf(s)?;
 
         Ok((s, Self { field, val }))
+    }
+}
+
+impl fmt::Display for Header<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}: {}", self.field, self.val)
     }
 }

@@ -1,9 +1,12 @@
+use std::fmt;
+
 /// An HTTP version.
 ///
 /// ```
 /// use book_web_server::Version;
 ///
 /// assert_eq!(Version::new("HTTP/1.1"), Ok(("", Version::OneDotOne)));
+/// assert_eq!(format!("{}", Version::OneDotOne), "HTTP/1.1".to_string());
 /// ```
 #[derive(Debug, PartialEq)]
 pub enum Version {
@@ -22,5 +25,13 @@ impl Version {
         })(s)?;
 
         Ok((s, version))
+    }
+}
+
+impl fmt::Display for Version {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::OneDotOne => f.write_str("HTTP/1.1"),
+        }
     }
 }

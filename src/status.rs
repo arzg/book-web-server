@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// An HTTP response status.
 ///
 /// ```
@@ -5,6 +7,7 @@
 ///
 /// assert_eq!(Status::Continue.code(), 100);
 /// assert_eq!(Status::Continue.reason_phrase(), "Continue");
+/// assert_eq!(format!("{}", Status::Ok), "200 OK");
 /// ```
 pub enum Status {
     Continue,
@@ -138,5 +141,11 @@ impl Status {
             Self::GatewayTimeout => "Gateway Time-out",
             Self::HttpVersionNotSupported => "HTTP Version not supported",
         }
+    }
+}
+
+impl fmt::Display for Status {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {}", self.code(), self.reason_phrase())
     }
 }
