@@ -10,8 +10,7 @@ async fn main() -> anyhow::Result<()> {
     while let Some(stream) = incoming.next().await {
         let stream = stream?;
 
-        // We don’t want to stop the server if an error occurs, so just ignore it and continue.
-        let _ = handle_connection(stream).await;
+        tokio::spawn(handle_connection(stream));
     }
 
     Ok(())
