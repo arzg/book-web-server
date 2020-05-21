@@ -38,7 +38,7 @@ impl<'a> Uri<'a> {
         // The trailing slash is only required if no components were found (i.e. if no components
         // are found, then ‘/’ is the bare minimum).
         let (s, _) = if components.is_empty() {
-            map(tag("/"), |s| Some(s))(s)?
+            map(tag("/"), Some)(s)?
         } else {
             opt(tag("/"))(s)?
         };
